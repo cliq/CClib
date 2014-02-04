@@ -1,0 +1,14 @@
+.gradle
+local.properties
+.DS_Store
+._*
+
+.idea
+*.iml
+
+!.projectfiles/*
+.projectfiles/.idea/workspace.xml
+.projectfiles/.idea/tasks.xml
+.projectfiles/.idea/libraries/*
+
+build
