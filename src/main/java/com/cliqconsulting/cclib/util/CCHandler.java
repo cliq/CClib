@@ -1,6 +1,7 @@
 package com.cliqconsulting.cclib.util;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 /**
@@ -11,11 +12,15 @@ import android.os.Message;
  * <p/>
  * <p/>
  * Created by Flavio Ramos on 1/29/14 16:06.
- * Copyright (c) 2013 Fanatee. All rights reserved.
+ * Copyright (c) 2013 Cliq Consulting. All rights reserved.
  */
 public abstract class CCHandler<ResponseType> extends Handler {
 
 	private Object mValue;
+
+	public CCHandler(Looper mainLooper) {
+		super(mainLooper);
+	}
 
 	@Override
 	public void handleMessage(Message msg) {

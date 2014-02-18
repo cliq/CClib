@@ -7,7 +7,7 @@ import java.text.Normalizer;
  * com.cliqconsulting.cclib.util.CCUtil
  * <p/>
  * Created by Flavio Ramos on 1/17/14 13:36.
- * Copyright (c) 2013 Fanatee. All rights reserved.
+ * Copyright (c) 2013 Cliq Consulting. All rights reserved.
  */
 public class CCUtil {
 

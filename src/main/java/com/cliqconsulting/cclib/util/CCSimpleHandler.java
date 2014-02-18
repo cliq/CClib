@@ -11,7 +11,7 @@ import android.os.Message;
  * <p/>
  * <p/>
  * Created by Flavio Ramos on 1/29/14 18:33.
- * Copyright (c) 2013 Fanatee. All rights reserved.
+ * Copyright (c) 2013 Cliq Consulting. All rights reserved.
  */
 public abstract class CCSimpleHandler extends Handler {
 

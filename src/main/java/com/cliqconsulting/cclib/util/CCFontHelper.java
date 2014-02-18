@@ -15,7 +15,7 @@ import java.util.Map;
  * com.cliqconsulting.cclib.util.CCFontHelper
  * <p/>
  * Created by Flavio Ramos on 1/16/14 10:58.
- * Copyright (c) 2013 Fanatee. All rights reserved.
+ * Copyright (c) 2013 Cliq Consulting. All rights reserved.
  */
 public class CCFontHelper {
 

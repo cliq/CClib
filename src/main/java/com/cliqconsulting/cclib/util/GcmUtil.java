@@ -15,7 +15,7 @@ import java.io.IOException;
  * Helps with Google Cloud Messaging calls.
  * <p/>
  * Created by Flavio Ramos on 1/3/14 17:36.
- * Copyright (c) 2013 Fanatee. All rights reserved.
+ * Copyright (c) 2013 Cliq Consulting. All rights reserved.
  */
 public class GcmUtil {
 

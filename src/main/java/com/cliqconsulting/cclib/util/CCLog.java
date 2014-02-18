@@ -7,7 +7,7 @@ import android.util.Log;
  * com.cliqconsulting.cclib.facebook.CCLog
  * 
  * Created by Flavio Ramos on 12/12/13 12:34 PM.
- * Copyright (c) 2013 Fanatee. All rights reserved.
+ * Copyright (c) 2013 Cliq Consulting. All rights reserved.
  */
 public class CCLog {
 

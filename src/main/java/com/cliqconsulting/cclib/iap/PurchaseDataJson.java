@@ -5,7 +5,7 @@ package com.cliqconsulting.cclib.iap;
  * com.cliqconsulting.cclib.iap.PurchaseDataJson
  * <p/>
  * Created by Flavio Ramos on 1/9/14 14:10.
- * Copyright (c) 2013 Fanatee. All rights reserved.
+ * Copyright (c) 2013 Cliq Consulting. All rights reserved.
  */
 public class PurchaseDataJson {
 

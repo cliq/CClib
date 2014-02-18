@@ -22,7 +22,7 @@ import java.util.UUID;
  * com.cliqconsulting.cclib.iap.BaseIapActivity
  * <p/>
  * Created by Flavio Ramos on 1/9/14 11:18.
- * Copyright (c) 2013 Fanatee. All rights reserved.
+ * Copyright (c) 2013 Cliq Consulting. All rights reserved.
  */
 public abstract class BaseIapActivity extends Activity {
 
