@@ -1,8 +1,8 @@
-package com.cliqconsulting.cclib.iap;
+package com.cliqconsulting.cclib.google.iap;
 
 /**
  * Missing Link
- * com.cliqconsulting.cclib.iap.StoreProductVO
+ * com.cliqconsulting.cclib.google.iap.StoreProductVO
  * <p/>
  * Created by Flavio Ramos on 1/8/14 23:21.
  * Copyright (c) 2013 Cliq Consulting. All rights reserved.

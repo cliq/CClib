@@ -1,4 +1,4 @@
-package com.cliqconsulting.cclib.iap;
+package com.cliqconsulting.cclib.google.iap;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -19,7 +19,7 @@ import java.util.UUID;
 
 /**
  * Missing Link
- * com.cliqconsulting.cclib.iap.BaseIapActivity
+ * com.cliqconsulting.cclib.google.iap.BaseIapActivity
  * <p/>
  * Created by Flavio Ramos on 1/9/14 11:18.
  * Copyright (c) 2013 Cliq Consulting. All rights reserved.

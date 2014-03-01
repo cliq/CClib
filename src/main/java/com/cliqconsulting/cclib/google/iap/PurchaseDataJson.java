@@ -1,8 +1,8 @@
-package com.cliqconsulting.cclib.iap;
+package com.cliqconsulting.cclib.google.iap;
 
 /**
  * Missing Link
- * com.cliqconsulting.cclib.iap.PurchaseDataJson
+ * com.cliqconsulting.cclib.google.iap.PurchaseDataJson
  * <p/>
  * Created by Flavio Ramos on 1/9/14 14:10.
  * Copyright (c) 2013 Cliq Consulting. All rights reserved.

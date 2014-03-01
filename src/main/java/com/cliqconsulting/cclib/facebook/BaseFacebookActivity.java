@@ -1,8 +1,8 @@
 package com.cliqconsulting.cclib.facebook;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import com.cliqconsulting.cclib.framework.BaseActivity;
 import com.cliqconsulting.cclib.util.CCLog;
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -15,7 +15,7 @@ import java.util.List;
  * User: flavioramos
  * 12/11/13 2:30 PM
  */
-public abstract class BaseFacebookActivity extends Activity {
+public abstract class BaseFacebookActivity extends BaseActivity {
 
 	private Session.StatusCallback statusCallback = new SessionStatusCallback();
 	private boolean facebookConnected;

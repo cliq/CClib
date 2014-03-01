@@ -5,14 +5,13 @@ import android.os.Looper;
 import android.os.Message;
 
 /**
- * Missing Link
- * com.cliqconsulting.cclib.util.CCHandler
+ * CCHandler
  * <p/>
  * Generics based handler utility.
  * <p/>
  * <p/>
  * Created by Flavio Ramos on 1/29/14 16:06.
- * Copyright (c) 2013 Cliq Consulting. All rights reserved.
+ * Copyright (c) 2013. All rights reserved.
  */
 public abstract class CCHandler<ResponseType> extends Handler {
 
@@ -20,6 +19,10 @@ public abstract class CCHandler<ResponseType> extends Handler {
 
 	public CCHandler(Looper mainLooper) {
 		super(mainLooper);
+	}
+
+	public CCHandler() {
+		super();
 	}
 
 	@Override

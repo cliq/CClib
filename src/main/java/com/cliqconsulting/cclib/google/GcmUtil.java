@@ -1,16 +1,17 @@
-package com.cliqconsulting.cclib.util;
+package com.cliqconsulting.cclib.google;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import com.cliqconsulting.cclib.util.CCSimpleHandler;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
 
 /**
  * Missing Link
- * com.cliqconsulting.cclib.util.GcmUtil
+ * com.cliqconsulting.cclib.google.GcmUtil
  * <p/>
  * Helps with Google Cloud Messaging calls.
  * <p/>
@@ -37,7 +38,7 @@ public class GcmUtil {
 		if (msg != null) {
 			mHandler.setSuccess(msg);
 		} else {
-			mHandler.onError();
+			mHandler.onError(null);
 		}
 	}
 
