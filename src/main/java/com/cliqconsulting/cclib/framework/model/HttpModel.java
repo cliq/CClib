@@ -1,5 +1,6 @@
 package com.cliqconsulting.cclib.framework.model;
 
+import android.text.TextUtils;
 import com.cliqconsulting.cclib.framework.http.HttpResponse;
 import com.cliqconsulting.cclib.framework.http.IHttpWrapper;
 import com.cliqconsulting.cclib.framework.http.IHttpWrapperListener;
@@ -37,7 +38,7 @@ public abstract class HttpModel extends Model<byte[]> implements IHttpWrapperLis
 	/**
 	 * Perform http request.
 	 */
-	@Override public final void load() {
+	@Override public void load() {
 
 		Map<String, String> requestData = getRequestData();
 		Map<String, String> headersData = getHeaders();
@@ -45,39 +46,35 @@ public abstract class HttpModel extends Model<byte[]> implements IHttpWrapperLis
 		Iterator<String> iterator;
 		String key;
 
-		CCLog.logDebug("URL: " + getUrl());
-		CCLog.logDebug("-   Sending " + getRequestMethod() + " request: ");
-		CCLog.logDebug("-   Headers: ");
+		CCLog.logDebug("[HTTP] URL:", getUrl());
+		CCLog.logDebug("[HTTP]   Request method:", getRequestMethod().toString());
+		CCLog.logDebug("[HTTP]   Headers:");
 		iterator = headersData.keySet().iterator();
 		while (iterator.hasNext()) {
 			key = iterator.next();
-			CCLog.logDebug("-       " + key + ": " + headersData.get(key));
+			CCLog.logDebug("[HTTP]       ", key, ":", headersData.get(key));
 		}
-		CCLog.logDebug("-   Data: ");
+		CCLog.logDebug("[HTTP]   Data: ");
 		iterator = requestData.keySet().iterator();
 		while (iterator.hasNext()) {
 			key = iterator.next();
-			CCLog.logDebug("-       " + key + ": " + requestData.get(key));
+			CCLog.logDebug("[HTTP]       ", key, ":", requestData.get(key));
 		}
 
-
 		setLoadingStatus();
-		getHttpWrapper().request(
-				this,
-				getRequestMethod(),
-				getUrl(),
-				requestData,
-				headersData
-		);
+
+		getHttpWrapper().request(this, getRequestMethod(), getUrl(), requestData, headersData);
 	}
 
 	@Override public void onResponse(HttpResponse response) {
+		CCLog.logDebug("[HTTP] Received from URL:", getUrl(), "with status", String.valueOf(response.getStatusCode()));
+		CCLog.logDebug(new String(response.getData()));
+
 		if (response.getStatusCode() >= 200 && response.getStatusCode() < 400) {
 			setContent(response.getData());
 		} else {
 			setError(String.valueOf(response.getStatusCode()));
 		}
-
 	}
 
 	@Override public void onError(String error) {

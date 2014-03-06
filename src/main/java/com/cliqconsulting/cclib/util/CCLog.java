@@ -1,5 +1,6 @@
 package com.cliqconsulting.cclib.util;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -14,24 +15,52 @@ public class CCLog {
 	public static boolean debugging = false;
 	private static String mDefaultTag;
 
-	public static void logError(String tag, String error) {
+	public static void logErrorWithTag(String tag, String... error) {
 		if (debugging) {
-			Log.e(tag, error);
+			Log.e(tag, TextUtils.join(" ", error));
 		}
 	}
 
-	public static void logDebug(String tag, String message) {
+	public static void logDebugWithTag(String tag, String... message) {
 		if (debugging) {
-			Log.d(tag, message);
+			Log.d(tag, TextUtils.join(" ", message));
 		}
 	}
 
-	public static void logError(String error) {
-		logError(mDefaultTag, error);
+	public static void logInfoWithTag(String tag, String... message) {
+		if (debugging) {
+			Log.i(tag, TextUtils.join(" ", message));
+		}
 	}
 
-	public static void logDebug(String message) {
-		Log.d(mDefaultTag, message);
+	public static void logWarnWithTag(String tag, String... message) {
+		if (debugging) {
+			Log.w(tag, TextUtils.join(" ", message));
+		}
+	}
+
+	public static void logError(String... error) {
+		if (debugging) {
+			Log.e(mDefaultTag, TextUtils.join(" ", error));
+		}
+	}
+
+	public static void logDebug(String... message) {
+		if (debugging) {
+			Log.d(mDefaultTag, TextUtils.join(" ", message));
+		}
+	}
+
+	public static void logInfo(String... message) {
+		if (debugging) {
+			Log.i(mDefaultTag, TextUtils.join(" ", message));
+		}
+	}
+
+	public static void logWarn(String... message) {
+		if (debugging) {
+			Log.w(mDefaultTag, TextUtils.join(" ", message));
+		}
 	}
 
 	public static void setDefaultTag(String defaultTag) {

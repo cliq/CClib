@@ -23,20 +23,57 @@ public class AndroidPreferencesPeristence implements IPersistenceMethod {
 	}
 
 	@Override
-	public boolean save(String key, byte[] value) {
+	public boolean saveBytes(String key, byte[] value) {
+		return false;
+	}
+
+	@Override public boolean saveString(String key, String value) {
 		SharedPreferences.Editor editor = mSharedPreferences.edit();
-		editor.putString(key, new String(value));
+		editor.putString(key, value);
+		return editor.commit();
+	}
+
+	@Override public boolean saveInt(String key, int value) {
+		SharedPreferences.Editor editor = mSharedPreferences.edit();
+		editor.putInt(key, value);
+		return editor.commit();
+	}
+
+	@Override public boolean saveFloat(String key, float value) {
+		SharedPreferences.Editor editor = mSharedPreferences.edit();
+		editor.putFloat(key, value);
+		return editor.commit();
+	}
+
+	@Override public boolean saveBoolean(String key, boolean value) {
+		SharedPreferences.Editor editor = mSharedPreferences.edit();
+		editor.putBoolean(key, value);
 		return editor.commit();
 	}
 
 	@Override
-	public byte[] load(String key) {
+	public byte[] loadBytes(String key) {
+		return null;
+	}
+
+	@Override public String loadString(String key) {
 		String data = mSharedPreferences.getString(key, null);
-		if (data != null) {
-			return data.getBytes();
-		} else {
-			return new byte[0];
-		}
+		return data;
+	}
+
+	@Override public int loadInt(String key) {
+		int data = mSharedPreferences.getInt(key, 0);
+		return data;
+	}
+
+	@Override public float loadFloat(String key) {
+		float data = mSharedPreferences.getFloat(key, 0);
+		return data;
+	}
+
+	@Override public boolean loadBoolean(String key) {
+		boolean data = mSharedPreferences.getBoolean(key, false);
+		return data;
 	}
 
 	@Override

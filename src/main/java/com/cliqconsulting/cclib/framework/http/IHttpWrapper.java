@@ -10,6 +10,7 @@ import java.util.Map;
  */
 public interface IHttpWrapper {
 
+
 	public enum Method {
 		GET,
 		POST,
@@ -25,4 +26,5 @@ public interface IHttpWrapper {
 
 	public void cancelRequest(int requestId);
 
+	public void remove(int requestId);
 }

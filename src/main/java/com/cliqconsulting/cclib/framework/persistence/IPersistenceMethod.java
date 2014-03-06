@@ -15,7 +15,15 @@ public interface IPersistenceMethod {
 	 * @param value Value to be saved.
 	 * @return True if data was saved successfully.
 	 */
-	public boolean save(String key, byte[] value);
+	public boolean saveBytes(String key, byte[] value);
+
+	public boolean saveString(String key, String value);
+
+	public boolean saveInt(String key, int value);
+
+	public boolean saveFloat(String key, float value);
+
+	public boolean saveBoolean(String key, boolean value);
 
 	/**
 	 * Load data from source.
@@ -23,7 +31,15 @@ public interface IPersistenceMethod {
 	 * @param key Field name to be loaded.
 	 * @return Loaded data. Should return null if failed.
 	 */
-	public byte[] load(String key);
+	public byte[] loadBytes(String key);
+
+	public String loadString(String key);
+
+	public int loadInt(String key);
+
+	public float loadFloat(String key);
+
+	public boolean loadBoolean(String key);
 
 	/**
 	 * Clear data.

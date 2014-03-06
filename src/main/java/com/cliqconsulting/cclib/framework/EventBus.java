@@ -1,5 +1,6 @@
 package com.cliqconsulting.cclib.framework;
 
+import com.cliqconsulting.cclib.framework.model.Model;
 import com.squareup.otto.Bus;
 
 /**

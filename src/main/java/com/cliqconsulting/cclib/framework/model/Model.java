@@ -1,6 +1,6 @@
 package com.cliqconsulting.cclib.framework.model;
 
-import com.cliqconsulting.cclib.framework.DataManager;
+import com.cliqconsulting.cclib.framework.EventBus;
 
 /**
  * Model
@@ -16,7 +16,6 @@ public abstract class Model<T> {
 
 	public Model() {
 		mCurrentStatus = Status.EMPTY;
-		DataManager.registerModel(this);
 	}
 
 	public static enum Status {
@@ -41,35 +40,46 @@ public abstract class Model<T> {
 		mContent = content;
 		mCurrentStatus = Status.LOADED;
 		mCurrentError = null;
-		onStatusChanged();
+		postEvent();
 	}
 
-	protected final void clearContent() {
+	public final void clearContent() {
+		if (mCurrentStatus == Status.EMPTY) return;
 		mContent = null;
 		mCurrentStatus = Status.EMPTY;
 		mCurrentError = null;
-		onStatusChanged();
+		postEvent();
+	}
+
+	public final void setOutdated() {
+		if (mCurrentStatus == Status.OUTDATED) return;
+		mCurrentStatus = Status.OUTDATED;
+		mCurrentError = null;
+		postEvent();
 	}
 
 	protected final void setError(String error) {
 		mContent = null;
 		mCurrentStatus = Status.ERROR;
 		mCurrentError = error;
-		onStatusChanged();
+		postEvent();
 	}
 
 	protected void setLoadingStatus() {
+		if (mCurrentStatus == Status.LOADING) return;
 		mContent = null;
 		mCurrentStatus = Status.LOADING;
 		mCurrentError = null;
-		onStatusChanged();
+		postEvent();
 	}
 
+	public void postEvent() {
+		EventBus.getInstance().post(produceEvent());
+	}
+
+	public abstract ModelEvent produceEvent();
+
 	public abstract void load();
-
-	public abstract void onStatusChanged();
-
-	public abstract void onSubscribed(ISubscriberView subscriberView);
 
 	public final Object getError() {
 		return mCurrentError;

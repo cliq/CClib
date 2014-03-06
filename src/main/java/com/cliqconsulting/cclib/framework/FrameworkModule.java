@@ -2,6 +2,9 @@ package com.cliqconsulting.cclib.framework;
 
 import android.app.Application;
 import dagger.Module;
+import dagger.Provides;
+
+import javax.inject.Singleton;
 
 /**
  * FrameworkModule
