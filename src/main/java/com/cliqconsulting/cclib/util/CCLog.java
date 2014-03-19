@@ -66,4 +66,6 @@ public class CCLog {
 	public static void setDefaultTag(String defaultTag) {
 		mDefaultTag = defaultTag;
 	}
+
+
 }

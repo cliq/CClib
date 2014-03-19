@@ -1,6 +1,5 @@
 package com.cliqconsulting.cclib.framework;
 
-import com.cliqconsulting.cclib.framework.model.Model;
 import com.squareup.otto.Bus;
 
 /**
@@ -14,7 +13,7 @@ public class EventBus extends Bus {
 	private static EventBus mInstance;
 
 	public static EventBus getInstance() {
-		if (mInstance==null) {
+		if (mInstance == null) {
 			mInstance = new EventBus();
 		}
 

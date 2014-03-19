@@ -1,6 +1,5 @@
 package com.cliqconsulting.cclib.framework.model;
 
-import android.text.TextUtils;
 import com.cliqconsulting.cclib.framework.http.HttpResponse;
 import com.cliqconsulting.cclib.framework.http.IHttpWrapper;
 import com.cliqconsulting.cclib.framework.http.IHttpWrapperListener;
@@ -78,6 +77,7 @@ public abstract class HttpModel extends Model<byte[]> implements IHttpWrapperLis
 	}
 
 	@Override public void onError(String error) {
+		CCLog.logError("[ERROR]", error);
 		setError(error);
 	}
 }
