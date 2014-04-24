@@ -93,7 +93,8 @@ public abstract class BaseFacebookActivity extends BaseActivity {
 		if (requested.size() <= obtained.size()) {
 			facebookConnectSuccess();
 		} else {
-			facebookConnectFailure();
+			Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(this, getPermissionList());
+			Session.getActiveSession().requestNewPublishPermissions(newPermissionsRequest);
 		}
 
 	}
@@ -126,9 +127,7 @@ public abstract class BaseFacebookActivity extends BaseActivity {
 				Session.setActiveSession(session);
 				checkFacebookPermissions();
 			} else {
-				if (isFacebookConnected()) {
-					facebookConnectFailure();
-				}
+				facebookConnectFailure();
 			}
 		}
 	}
