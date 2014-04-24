@@ -38,6 +38,9 @@ public abstract class HttpModel extends Model<byte[]> implements IHttpWrapperLis
 	 * Perform http request.
 	 */
 	@Override public void load() {
+		if (getCurrentStatus().equals(Status.LOADING)) {
+			return;
+		}
 
 		Map<String, String> requestData = getRequestData();
 		Map<String, String> headersData = getHeaders();
