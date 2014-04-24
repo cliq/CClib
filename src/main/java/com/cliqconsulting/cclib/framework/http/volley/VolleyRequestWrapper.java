@@ -53,8 +53,8 @@ public class VolleyRequestWrapper implements Response.ErrorListener {
 		// TODO set this configurable externally
 		mRequest.setRetryPolicy(
 				new DefaultRetryPolicy(
-						30000,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+						60000,
+						0,
 						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
 				)
 		);
