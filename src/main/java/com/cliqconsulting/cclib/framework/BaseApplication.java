@@ -13,6 +13,9 @@ import java.util.ArrayList;
  */
 public abstract class BaseApplication extends Application {
 
+	public static boolean isRunning = false;
+	protected static int mNotificationsId = 1;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -24,4 +27,8 @@ public abstract class BaseApplication extends Application {
 	}
 
 	protected abstract ArrayList<Object> getModules();
+
+	public static int getNotificationsId() {
+		return mNotificationsId;
+	};
 }
