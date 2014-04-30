@@ -1,17 +1,17 @@
 package com.cliqconsulting.cclib.google;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import com.cliqconsulting.cclib.util.CCSimpleHandler;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
 
 /**
- * Missing Link
- * com.cliqconsulting.cclib.google.GcmUtil
+ * GcmUtil
  * <p/>
  * Helps with Google Cloud Messaging calls.
  * <p/>
@@ -20,13 +20,15 @@ import java.io.IOException;
  */
 public class GcmUtil {
 
+	public static final String KEY_REGISTRATION_ID = "registrationId";
+	public static final String KEY_APP_VERSION = "appVersion";
+	public static final String PREF_GCM_REGISTRATION = "gcm_registration";
 	private String mProjectId;
 	private Context mContext;
 	private CCSimpleHandler mHandler;
 
 	/**
-	 *
-	 * @param projectId	Project Id from Google API Console
+	 * @param projectId Project Id from Google API Console
 	 * @param context
 	 */
 	public GcmUtil(String projectId, Context context) {
@@ -45,27 +47,68 @@ public class GcmUtil {
 	public void register(CCSimpleHandler handler) {
 		mHandler = handler;
 
-		new AsyncTask<Object, String, String>() {
-			@Override
-			protected String doInBackground(Object... params) {
-				String registrationId = null;
+		String currentRegistrationId = getRegistrationId();
 
-				try {
-					GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(mContext);
-					registrationId = gcm.register(mProjectId);
-				} catch (IOException e) {
-					e.printStackTrace();
+		if (currentRegistrationId == null) {
+			new AsyncTask<Object, String, String>() {
+				@Override
+				protected String doInBackground(Object... params) {
+					String registrationId = null;
+
+					try {
+						GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(mContext);
+						registrationId = gcm.register(mProjectId);
+						storeRegistrationId(registrationId);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					return registrationId;
 				}
 
-				return registrationId;
-			}
+				@Override
+				protected void onPostExecute(String msg) {
+					setRegistrationId(msg);
+				}
+			}.execute(null, null, null);
+		} else {
+			setRegistrationId(currentRegistrationId);
+		}
+	}
 
-			@Override
-			protected void onPostExecute(String msg) {
-				setRegistrationId(msg);
-			}
-		}.execute(null, null, null);
+	private String getRegistrationId() {
+		final SharedPreferences prefs = mContext.getSharedPreferences(PREF_GCM_REGISTRATION, Context.MODE_PRIVATE);
+		String registrationId = prefs.getString(KEY_REGISTRATION_ID, null);
 
+		if (registrationId == null) {
+			return null;
+		}
+
+		int registeredVersion = prefs.getInt(KEY_APP_VERSION, 0);
+		int currentVersion = getAppVersion();
+		if (registeredVersion != currentVersion) {
+			return null;
+		}
+		return registrationId;
+	}
+
+	private int getAppVersion() {
+		try {
+			PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
+			return packageInfo.versionCode;
+		} catch (PackageManager.NameNotFoundException e) {
+			// should never happen
+			return 0;
+		}
+	}
+
+	private void storeRegistrationId(String regId) {
+		final SharedPreferences prefs = mContext.getSharedPreferences(PREF_GCM_REGISTRATION, Context.MODE_PRIVATE);
+		int appVersion = getAppVersion();
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putString(KEY_REGISTRATION_ID, regId);
+		editor.putInt(KEY_APP_VERSION, appVersion);
+		editor.commit();
 	}
 
 }
