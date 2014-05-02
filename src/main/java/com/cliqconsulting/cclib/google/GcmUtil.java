@@ -76,6 +76,38 @@ public class GcmUtil {
 		}
 	}
 
+	public void unregister(CCSimpleHandler handler) {
+		mHandler = handler;
+
+		String currentRegistrationId = getRegistrationId();
+
+		if (currentRegistrationId != null) {
+			new AsyncTask<Object, String, String>() {
+				@Override
+				protected String doInBackground(Object... params) {
+					String registrationId = null;
+
+					try {
+						GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(mContext);
+						gcm.unregister();
+						storeRegistrationId(null);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					return null;
+				}
+
+				@Override
+				protected void onPostExecute(String msg) {
+					setRegistrationId(msg);
+				}
+			}.execute(null, null, null);
+		} else {
+			setRegistrationId(currentRegistrationId);
+		}
+	}
+
 	private String getRegistrationId() {
 		final SharedPreferences prefs = mContext.getSharedPreferences(PREF_GCM_REGISTRATION, Context.MODE_PRIVATE);
 		String registrationId = prefs.getString(KEY_REGISTRATION_ID, null);
@@ -106,8 +138,13 @@ public class GcmUtil {
 		final SharedPreferences prefs = mContext.getSharedPreferences(PREF_GCM_REGISTRATION, Context.MODE_PRIVATE);
 		int appVersion = getAppVersion();
 		SharedPreferences.Editor editor = prefs.edit();
-		editor.putString(KEY_REGISTRATION_ID, regId);
-		editor.putInt(KEY_APP_VERSION, appVersion);
+		if (regId != null) {
+			editor.putString(KEY_REGISTRATION_ID, regId);
+			editor.putInt(KEY_APP_VERSION, appVersion);
+		} else {
+			editor.remove(KEY_REGISTRATION_ID);
+			editor.remove(KEY_APP_VERSION);
+		}
 		editor.commit();
 	}
 
