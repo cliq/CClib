@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import com.android.vending.billing.IInAppBillingService;
+import com.cliqconsulting.cclib.util.CCLog;
+import com.cliqconsulting.cclib.util.CCSimpleHandler;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -18,8 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Missing Link
- * com.cliqconsulting.cclib.google.iap.BaseIapActivity
+ * BaseIapActivity
  * <p/>
  * Created by Flavio Ramos on 1/9/14 11:18.
  * Copyright (c) 2013 Cliq Consulting. All rights reserved.
@@ -53,11 +54,12 @@ public abstract class BaseIapActivity extends Activity {
 					try {
 						purchaseDataJson = new Gson().fromJson(purchaseData, PurchaseDataJson.class);
 					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					if (purchaseData == null) {
+					if (purchaseDataJson == null) {
 						onPurchaseFailed();
 					} else {
-						onPurchaseSuccess(purchaseDataJson);
+						onPurchaseSuccess(purchaseDataJson, dataSignature);
 					}
 				} else {
 					onPurchaseFailed();
@@ -125,6 +127,7 @@ public abstract class BaseIapActivity extends Activity {
 							product = new Gson().fromJson(thisResponse, StoreProductVO.class);
 							result.add(product);
 						} catch (Exception e) {
+							e.printStackTrace();
 						}
 					}
 				} else {
@@ -147,30 +150,123 @@ public abstract class BaseIapActivity extends Activity {
 	}
 
 	public void buyProduct(StoreProductVO storeProductVO) {
-
 		Bundle buyIntentBundle = null;
 		String uuid = UUID.randomUUID().toString();
 
 		try {
 			buyIntentBundle = mService.getBuyIntent(3, getPackageName(), storeProductVO.productId, "inapp", uuid);
 		} catch (RemoteException e) {
+			e.printStackTrace();
 			onPurchaseFailed();
 		}
+
 		PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
 
 		try {
-			startIntentSenderForResult(pendingIntent.getIntentSender(),
-					REQUEST_CODE_PURCHASE, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
-					Integer.valueOf(0));
+			startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE_PURCHASE, new Intent(), 0, 0, 0);
 		} catch (Exception e) {
+			e.printStackTrace();
 			onPurchaseFailed();
 		}
 
 	}
 
+	public void consumeProduct(String token, final CCSimpleHandler handler) {
+		new AsyncTask<String, Integer, Integer>() {
+			@Override protected Integer doInBackground(String... strings) {
+				int response = Integer.MIN_VALUE;
+
+				try {
+					response = mService.consumePurchase(3, getPackageName(), strings[0]);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+
+				return response;
+			}
+
+			@Override protected void onPostExecute(Integer integer) {
+				if (integer == 0) {
+					handler.setSuccess(integer);
+				} else {
+					handler.setError(integer);
+				}
+			}
+		}.execute(token);
+	}
+
+	public void getPurchasedItems(CCSimpleHandler<PurchasedItemVO[]> handler) {
+		loadPurchasedItems(null, new PurchasedItemVO[]{}, handler);
+	}
+
+	private void loadPurchasedItems(final String continuationToken, final PurchasedItemVO[] items, final CCSimpleHandler<PurchasedItemVO[]> handler) {
+		new Runnable() {
+			@Override public void run() {
+				Bundle ownedItems = null;
+
+				try {
+					ownedItems = mService.getPurchases(3, getPackageName(), "inapp", continuationToken);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+
+				if (ownedItems == null) {
+					handler.setError();
+				}
+
+				int response = ownedItems.getInt("RESPONSE_CODE");
+
+				if (response == 0) {
+					ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+					ArrayList<String> purchaseDataList = ownedItems.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
+					ArrayList<String> signatureList = ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE");
+					String cToken = ownedItems.getString("INAPP_CONTINUATION_TOKEN");
+
+					PurchasedItemVO item;
+
+					PurchasedItemVO[] newItems = new PurchasedItemVO[items.length + purchaseDataList.size()];
+
+					for (int i = 0; i < items.length; i++) {
+						newItems[i] = items[i];
+					}
+
+					for (int i = 0; i < purchaseDataList.size(); ++i) {
+						item = new PurchasedItemVO();
+
+						if (purchaseDataList != null && i < purchaseDataList.size()) {
+							try {
+								item.purchasedData = new Gson().fromJson(purchaseDataList.get(i), PurchasedItemVO.PurchaseData.class);
+							} catch (Exception e) {
+								CCLog.logError(e.toString());
+							}
+						}
+
+						if (signatureList != null && i < signatureList.size()) {
+							item.signature = signatureList.get(i);
+						}
+
+						if (ownedSkus != null && i < ownedSkus.size()) {
+							item.sku = ownedSkus.get(i);
+						}
+
+						newItems[(items.length > 0 ? items.length - 1 : 0) + i] = item;
+					}
+
+					if (cToken != null) {
+						loadPurchasedItems(cToken, newItems, handler);
+					} else {
+						handler.setSuccess(newItems);
+					}
+				} else {
+					handler.setError();
+				}
+			}
+		}.run();
+	}
+
 	protected abstract void onProductListRecieved(List<StoreProductVO> storeProductVOs);
 
-	protected abstract void onPurchaseSuccess(PurchaseDataJson purchaseDataJson);
+	protected abstract void onPurchaseSuccess(PurchaseDataJson purchaseDataJson, String dataSignature);
 
 	protected abstract void onPurchaseFailed();
 
@@ -179,5 +275,4 @@ public abstract class BaseIapActivity extends Activity {
 	protected abstract String[] getExpectedProductList();
 
 	protected abstract void onServiceReady();
-
 }
