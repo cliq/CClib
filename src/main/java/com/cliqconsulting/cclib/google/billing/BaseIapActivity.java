@@ -1,4 +1,4 @@
-package com.cliqconsulting.cclib.google.iap;
+package com.cliqconsulting.cclib.google.billing;
 
 import android.app.Activity;
 import android.app.PendingIntent;
