@@ -39,6 +39,12 @@ public class AndroidPreferencesPeristence implements IPersistenceMethod {
 		return editor.commit();
 	}
 
+	@Override public boolean saveLong(String key, long value) {
+		SharedPreferences.Editor editor = mSharedPreferences.edit();
+		editor.putLong(key, value);
+		return editor.commit();
+	}
+
 	@Override public boolean saveFloat(String key, float value) {
 		SharedPreferences.Editor editor = mSharedPreferences.edit();
 		editor.putFloat(key, value);
@@ -63,6 +69,11 @@ public class AndroidPreferencesPeristence implements IPersistenceMethod {
 
 	@Override public int loadInt(String key) {
 		int data = mSharedPreferences.getInt(key, 0);
+		return data;
+	}
+
+	@Override public long loadLong(String key) {
+		long data = mSharedPreferences.getLong(key, 0);
 		return data;
 	}
 

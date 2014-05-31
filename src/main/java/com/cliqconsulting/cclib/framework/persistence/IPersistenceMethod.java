@@ -21,6 +21,8 @@ public interface IPersistenceMethod {
 
 	public boolean saveInt(String key, int value);
 
+	boolean saveLong(String key, long value);
+
 	public boolean saveFloat(String key, float value);
 
 	public boolean saveBoolean(String key, boolean value);
@@ -49,4 +51,5 @@ public interface IPersistenceMethod {
 	 */
 	public boolean clear(String key);
 
+	public long loadLong(String gameStateSaveTime);
 }
