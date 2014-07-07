@@ -10,9 +10,6 @@ apply plugin: 'android-library'
 
 repositories {
     mavenCentral()
-    maven {
-        url "http://mente.github.io/facebook-api-android-aar"
-    }
 }
 
 android {
@@ -31,7 +28,7 @@ configurations {
 }
 
 dependencies {
-    compile 'com.facebook:facebook-android-sdk:+@aar'
+    compile project(':dependencies:facebook')
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.google.android.gms:play-services:4.2.42+'
     compile 'com.mcxiaoke.volley:library:1.0+'
