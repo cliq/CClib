@@ -5,7 +5,6 @@
           android:versionName="1.0">
 
     <application
-            android:label="CClib"
             android:icon="@drawable/ic_launcher">
     </application>
 </manifest>
