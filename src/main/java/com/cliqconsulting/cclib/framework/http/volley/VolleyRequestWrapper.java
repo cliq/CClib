@@ -1,6 +1,11 @@
 package com.cliqconsulting.cclib.framework.http.volley;
 
-import com.android.volley.*;
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.cliqconsulting.cclib.framework.http.HttpResponse;
 import com.cliqconsulting.cclib.framework.http.IHttpWrapperListener;
 
@@ -30,7 +35,7 @@ public class VolleyRequestWrapper implements Response.ErrorListener {
 		mVolleyWrapper = volleyWrapper;
 
 		// when using GET method getParams() is never called, so append parameters to URL manually
-		if (method == VolleyRequest.Method.GET) {
+		if (method == VolleyRequest.Method.GET && values.size() > 0) {
 			StringBuilder sb = new StringBuilder(url);
 			sb.append("?");
 

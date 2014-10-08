@@ -56,12 +56,14 @@ public abstract class HttpModel extends Model<byte[]> implements IHttpWrapperLis
 			key = iterator.next();
 			CCLog.logDebug("[HTTP]       ", key, ":", headersData.get(key));
 		}
-		CCLog.logDebug("[HTTP]   Data: ");
-		iterator = requestData.keySet().iterator();
-		while (iterator.hasNext()) {
-			key = iterator.next();
-			CCLog.logDebug("[HTTP]       ", key, ":", requestData.get(key));
-		}
+        if (requestData.size() > 0) {
+            CCLog.logDebug("[HTTP]   Data: ");
+            iterator = requestData.keySet().iterator();
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                CCLog.logDebug("[HTTP]       ", key, ":", requestData.get(key));
+            }
+        }
 
 		setLoadingStatus();
 
