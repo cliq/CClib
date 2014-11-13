@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+
 import com.android.vending.billing.IInAppBillingService;
 import com.cliqconsulting.cclib.framework.EventBus;
 import com.cliqconsulting.cclib.util.CCLog;
@@ -54,26 +55,30 @@ public abstract class BillingManager {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 			case REQUEST_CODE_PURCHASE:
-				int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
-				String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
-				String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
+                if (data != null) {
+                    int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
+                    String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
+                    String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
 
-				PurchaseDataJson purchaseDataJson = null;
+                    PurchaseDataJson purchaseDataJson = null;
 
-				if (resultCode == Activity.RESULT_OK) {
-					try {
-						purchaseDataJson = new Gson().fromJson(purchaseData, PurchaseDataJson.class);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					if (purchaseDataJson == null) {
-						producePurchaseFailedEvent();
-					} else {
-						producePurchaseSuccessEvent(purchaseDataJson, dataSignature);
-					}
-				} else {
-					producePurchaseFailedEvent();
-				}
+                    if (resultCode == Activity.RESULT_OK) {
+                        try {
+                            purchaseDataJson = new Gson().fromJson(purchaseData, PurchaseDataJson.class);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        if (purchaseDataJson == null) {
+                            producePurchaseFailedEvent();
+                        } else {
+                            producePurchaseSuccessEvent(purchaseDataJson, dataSignature);
+                        }
+                    } else {
+                        producePurchaseFailedEvent();
+                    }
+                } else {
+                    producePurchaseFailedEvent();
+                }
 
 				break;
 		}
