@@ -65,6 +65,7 @@ public abstract class BillingManager {
                     if (resultCode == Activity.RESULT_OK) {
                         try {
                             purchaseDataJson = new Gson().fromJson(purchaseData, PurchaseDataJson.class);
+                            purchaseDataJson.purchaseJson = purchaseData;
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

@@ -16,5 +16,6 @@ public class PurchaseDataJson {
 	public String purchaseState;
 	public String developerPayload;
 	public String purchaseToken;
+    public String purchaseJson;
 
 }
