@@ -180,6 +180,9 @@ public abstract class BillingManager {
 
 		new AsyncTask<Object, Object, Object>() {
 			@Override protected Object doInBackground(Object[] objects) {
+                if (mService == null || mActivity == null)
+                    this.cancel(true);
+
 				Bundle ownedItems = null;
 
 				try {
