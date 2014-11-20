@@ -253,41 +253,46 @@ public abstract class BillingManager {
 			@Override
 			protected List<StoreProductVO> doInBackground(Object... objects) {
 				ArrayList skuList = new ArrayList();
+                List<StoreProductVO> result;
+                if (mExpectedSkus == null) {
+                    result = null;
+                } else {
+                    result = new ArrayList<StoreProductVO>();
 
-				List<StoreProductVO> result = new ArrayList<StoreProductVO>();
+                    for (int i = 0; i < mExpectedSkus.length; i++) skuList.add(mExpectedSkus[i]);
 
-				for (int i = 0; i < mExpectedSkus.length; i++) skuList.add(mExpectedSkus[i]);
+                    Bundle querySkus = new Bundle();
 
-				Bundle querySkus = new Bundle();
+                    querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
 
-				querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
+                    Bundle skuDetails = null;
 
-				Bundle skuDetails = null;
+                    try {
+                        skuDetails = mService.getSkuDetails(3, mActivity.getPackageName(), "inapp", querySkus);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
 
-				try {
-					skuDetails = mService.getSkuDetails(3, mActivity.getPackageName(), "inapp", querySkus);
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
+                    int response = skuDetails.getInt("RESPONSE_CODE");
 
-				int response = skuDetails.getInt("RESPONSE_CODE");
+                    if (response == 0) {
+                        ArrayList<String> responseList = skuDetails.getStringArrayList("DETAILS_LIST");
 
-				if (response == 0) {
-					ArrayList<String> responseList = skuDetails.getStringArrayList("DETAILS_LIST");
+                        StoreProductVO product;
 
-					StoreProductVO product;
+                        for (String thisResponse : responseList) {
+                            try {
+                                product = new Gson().fromJson(thisResponse, StoreProductVO.class);
+                                result.add(product);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    } else {
+                        result = null;
+                    }
 
-					for (String thisResponse : responseList) {
-						try {
-							product = new Gson().fromJson(thisResponse, StoreProductVO.class);
-							result.add(product);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				} else {
-					result = null;
-				}
+                }
 
 				return result;
 			}
