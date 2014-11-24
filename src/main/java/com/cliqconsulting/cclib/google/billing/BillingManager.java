@@ -148,6 +148,9 @@ public abstract class BillingManager {
 
 		new AsyncTask<String, Integer, Integer>() {
 			@Override protected Integer doInBackground(String... strings) {
+                if (mService == null || mActivity == null)
+                    this.cancel(true);
+
 				int response = Integer.MIN_VALUE;
 
 				try {
@@ -252,6 +255,9 @@ public abstract class BillingManager {
 
 			@Override
 			protected List<StoreProductVO> doInBackground(Object... objects) {
+                if (mService == null || mActivity == null)
+                    this.cancel(true);
+
 				ArrayList skuList = new ArrayList();
                 List<StoreProductVO> result;
                 if (mExpectedSkus == null) {
