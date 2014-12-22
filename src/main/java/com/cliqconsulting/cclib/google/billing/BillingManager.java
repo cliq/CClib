@@ -279,9 +279,7 @@ public abstract class BillingManager {
                         e.printStackTrace();
                     }
 
-                    int response = skuDetails.getInt("RESPONSE_CODE");
-
-                    if (response == 0) {
+                    if (skuDetails != null && skuDetails.getInt("RESPONSE_CODE") == 0) {
                         ArrayList<String> responseList = skuDetails.getStringArrayList("DETAILS_LIST");
 
                         StoreProductVO product;
