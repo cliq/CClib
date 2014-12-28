@@ -2,6 +2,7 @@ package com.cliqconsulting.cclib.facebook;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import com.cliqconsulting.cclib.framework.BaseActivity;
 import com.cliqconsulting.cclib.util.CCLog;
 import com.facebook.Session;
@@ -91,6 +92,7 @@ public abstract class BaseFacebookActivity extends BaseActivity {
 		CCLog.logDebug(CCLog.DEFAULT_TAG, "FB Permissions asked: " + requested.size() + ", obtained: " + obtained.size());
 
 		if (requested.size() <= obtained.size()) {
+            facebookConnected = true;
 			facebookConnectSuccess();
 		} else {
 			Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(this, getPermissionList());
@@ -128,6 +130,7 @@ public abstract class BaseFacebookActivity extends BaseActivity {
 				checkFacebookPermissions();
 			} else {
 				facebookConnectFailure();
+                facebookConnected = false;
 			}
 		}
 	}
