@@ -275,7 +275,7 @@ public abstract class BillingManager {
 
                     try {
                         skuDetails = mService.getSkuDetails(3, mActivity.getPackageName(), "inapp", querySkus);
-                    } catch (RemoteException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
