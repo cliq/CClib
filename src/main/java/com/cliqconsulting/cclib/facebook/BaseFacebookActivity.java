@@ -8,6 +8,7 @@ import com.cliqconsulting.cclib.util.CCLog;
 import com.facebook.Session;
 import com.facebook.SessionState;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public abstract class BaseFacebookActivity extends BaseActivity {
 
-	private Session.StatusCallback statusCallback = new SessionStatusCallback();
+	private Session.StatusCallback statusCallback = new SessionStatusCallback(this);
 	private boolean facebookConnected;
 
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +86,7 @@ public abstract class BaseFacebookActivity extends BaseActivity {
 		Session.saveSession(session, outState);
 	}
 
-	private void checkFacebookPermissions() {
+	void checkFacebookPermissions() {
 		List<String> requested = getPermissionList();
 		List<String> obtained = Session.getActiveSession().getPermissions();
 
@@ -100,6 +101,10 @@ public abstract class BaseFacebookActivity extends BaseActivity {
 		}
 
 	}
+
+    void setFacebookState(boolean isConnected) {
+        facebookConnected = isConnected;
+    }
 
 	/**
 	 * Must return a list of permissions needed on Facebook
@@ -122,16 +127,24 @@ public abstract class BaseFacebookActivity extends BaseActivity {
 		return facebookConnected;
 	}
 
-	private class SessionStatusCallback implements Session.StatusCallback {
+	private static class SessionStatusCallback implements Session.StatusCallback {
+        private WeakReference<BaseFacebookActivity> mActivity;
+
+        public SessionStatusCallback(BaseFacebookActivity activity) {
+            mActivity = new WeakReference<BaseFacebookActivity>(activity);
+        }
+
 		@Override
 		public void call(Session session, SessionState state, Exception exception) {
-			if (state.isOpened()) {
-				Session.setActiveSession(session);
-				checkFacebookPermissions();
-			} else {
-				facebookConnectFailure();
-                facebookConnected = false;
-			}
+            if (mActivity.get() != null) {
+                if (state.isOpened()) {
+                    Session.setActiveSession(session);
+                    mActivity.get().checkFacebookPermissions();
+                } else {
+                    mActivity.get().facebookConnectFailure();
+                    mActivity.get().setFacebookState(false);
+                }
+            }
 		}
 	}
 
