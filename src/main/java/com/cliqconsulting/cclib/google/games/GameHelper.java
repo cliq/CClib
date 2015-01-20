@@ -43,6 +43,7 @@ import com.google.android.gms.games.request.GameRequest;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.Plus.PlusOptions;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
@@ -96,10 +97,10 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
      * because some games methods require an Activity (a Context won't do). We
      * are careful not to leak these references: we release them on onStop().
      */
-    Activity mActivity = null;
+    WeakReference<Activity> mActivity = null;
 
     // app context
-    Context mAppContext = null;
+    WeakReference<Context> mAppContext = null;
 
     // Request code we use when invoking other Activities to complete the
     // sign-in flow.
@@ -195,8 +196,8 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
      *            or CLIENT_ALL to mean all clients).
      */
     public GameHelper(Activity activity, int clientsToUse) {
-        mActivity = activity;
-        mAppContext = activity.getApplicationContext();
+        mActivity = new WeakReference<Activity>(activity);
+        mAppContext = new WeakReference<Context>(activity.getApplicationContext());
         mRequestedClients = clientsToUse;
         mHandler = new Handler();
     }
@@ -276,30 +277,33 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
             throw new IllegalStateException(error);
         }
 
-        GoogleApiClient.Builder builder = new GoogleApiClient.Builder(
-                mActivity, this, this);
+        GoogleApiClient.Builder builder = null;
+        if (mActivity != null) {
+            builder = new GoogleApiClient.Builder(mActivity.get(), this, this);
 
-        if (0 != (mRequestedClients & CLIENT_GAMES)) {
-            builder.addApi(Games.API, mGamesApiOptions);
-            builder.addScope(Games.SCOPE_GAMES);
+            if (0 != (mRequestedClients & CLIENT_GAMES)) {
+                builder.addApi(Games.API, mGamesApiOptions);
+                builder.addScope(Games.SCOPE_GAMES);
+            }
+
+            if (0 != (mRequestedClients & CLIENT_PLUS)) {
+                builder.addApi(Plus.API);
+                builder.addScope(Plus.SCOPE_PLUS_LOGIN);
+            }
+
+            if (0 != (mRequestedClients & CLIENT_APPSTATE)) {
+                builder.addApi(AppStateManager.API);
+                builder.addScope(AppStateManager.SCOPE_APP_STATE);
+            }
+
+            if (0 != (mRequestedClients & CLIENT_SNAPSHOT)) {
+                builder.addScope(Drive.SCOPE_APPFOLDER);
+                builder.addApi(Drive.API);
+            }
+
+            mGoogleApiClientBuilder = builder;
         }
 
-        if (0 != (mRequestedClients & CLIENT_PLUS)) {
-            builder.addApi(Plus.API);
-            builder.addScope(Plus.SCOPE_PLUS_LOGIN);
-        }
-
-        if (0 != (mRequestedClients & CLIENT_APPSTATE)) {
-            builder.addApi(AppStateManager.API);
-            builder.addScope(AppStateManager.SCOPE_APP_STATE);
-        }
-
-        if (0 != (mRequestedClients & CLIENT_SNAPSHOT)) {
-            builder.addScope(Drive.SCOPE_APPFOLDER);
-            builder.addApi(Drive.API);
-        }
-
-        mGoogleApiClientBuilder = builder;
         return builder;
     }
 
@@ -376,8 +380,8 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
 
     /** Call this method from your Activity's onStart(). */
     public void onStart(Activity act) {
-        mActivity = act;
-        mAppContext = act.getApplicationContext();
+        mActivity = new WeakReference<Activity>(act);
+        mAppContext = new WeakReference<Context>(act.getApplicationContext());
 
         debugLog("onStart");
         assertConfigured("onStart");
@@ -760,30 +764,40 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     // Return the number of times the user has cancelled the sign-in flow in the
     // life of the app
     int getSignInCancellations() {
-        SharedPreferences sp = mAppContext.getSharedPreferences(
-                GAMEHELPER_SHARED_PREFS, Context.MODE_PRIVATE);
-        return sp.getInt(KEY_SIGN_IN_CANCELLATIONS, 0);
+        if (mAppContext.get() != null) {
+            SharedPreferences sp = mAppContext.get().getSharedPreferences(
+                    GAMEHELPER_SHARED_PREFS, Context.MODE_PRIVATE);
+            return sp.getInt(KEY_SIGN_IN_CANCELLATIONS, 0);
+        }
+
+        return -1;
     }
 
     // Increments the counter that indicates how many times the user has
     // cancelled the sign in
     // flow in the life of the application
     int incrementSignInCancellations() {
-        int cancellations = getSignInCancellations();
-        SharedPreferences.Editor editor = mAppContext.getSharedPreferences(
-                GAMEHELPER_SHARED_PREFS, Context.MODE_PRIVATE).edit();
-        editor.putInt(KEY_SIGN_IN_CANCELLATIONS, cancellations + 1);
-        editor.commit();
-        return cancellations + 1;
+        if (mAppContext.get() != null) {
+            int cancellations = getSignInCancellations();
+            SharedPreferences.Editor editor = mAppContext.get().getSharedPreferences(
+                    GAMEHELPER_SHARED_PREFS, Context.MODE_PRIVATE).edit();
+            editor.putInt(KEY_SIGN_IN_CANCELLATIONS, cancellations + 1);
+            editor.commit();
+            return cancellations + 1;
+        }
+
+        return -1;
     }
 
     // Reset the counter of how many times the user has cancelled the sign-in
     // flow.
     void resetSignInCancellations() {
-        SharedPreferences.Editor editor = mAppContext.getSharedPreferences(
-                GAMEHELPER_SHARED_PREFS, Context.MODE_PRIVATE).edit();
-        editor.putInt(KEY_SIGN_IN_CANCELLATIONS, 0);
-        editor.commit();
+        if (mAppContext.get() != null) {
+            SharedPreferences.Editor editor = mAppContext.get().getSharedPreferences(
+                    GAMEHELPER_SHARED_PREFS, Context.MODE_PRIVATE).edit();
+            editor.putInt(KEY_SIGN_IN_CANCELLATIONS, 0);
+            editor.commit();
+        }
     }
 
     /** Handles a connection failure. */
@@ -862,9 +876,11 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
             try {
                 // launch appropriate UI flow (which might, for example, be the
                 // sign-in flow)
-                mExpectingResolution = true;
-                mConnectionResult.startResolutionForResult(mActivity,
-                        RC_RESOLVE);
+                if (mActivity.get() != null) {
+                    mExpectingResolution = true;
+                    mConnectionResult.startResolutionForResult(mActivity.get(), RC_RESOLVE);
+                }
+
             } catch (SendIntentException e) {
                 // Try connecting again
                 debugLog("SendIntentException, so connecting again.");
@@ -902,7 +918,9 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
 
         if (reason.mActivityResultCode == GamesActivityResultCodes.RESULT_APP_MISCONFIGURED) {
             // print debug info for the developer
-            GameHelperUtils.printMisconfiguredDebugInfo(mAppContext);
+            if (mAppContext.get() != null) {
+                GameHelperUtils.printMisconfiguredDebugInfo(mAppContext.get());
+            }
         }
 
         showFailureDialog();
@@ -927,7 +945,9 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
             int actResp = mSignInFailureReason.getActivityResultCode();
 
             if (mShowErrorDialogs) {
-                showFailureDialog(mActivity, actResp, errorCode);
+                if (mActivity.get() != null) {
+                    showFailureDialog(mActivity.get(), actResp, errorCode);
+                }
             } else {
                 debugLog("Not showing error dialog because mShowErrorDialogs==false. "
                         + "" + "Error was: " + mSignInFailureReason);
@@ -991,19 +1011,19 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public Dialog makeSimpleDialog(String text) {
-        if (mActivity == null) {
+        if (mActivity.get() == null) {
             logError("*** makeSimpleDialog failed: no current Activity!");
             return null;
         }
-        return makeSimpleDialog(mActivity, text);
+        return makeSimpleDialog(mActivity.get(), text);
     }
 
     public Dialog makeSimpleDialog(String title, String text) {
-        if (mActivity == null) {
+        if (mActivity.get() == null) {
             logError("*** makeSimpleDialog failed: no current Activity!");
             return null;
         }
-        return makeSimpleDialog(mActivity, title, text);
+        return makeSimpleDialog(mActivity.get(), title, text);
     }
 
     void debugLog(String message) {
