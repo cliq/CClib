@@ -116,7 +116,7 @@ public abstract class BillingManager {
 	}
 
 	public void buyProduct(String productId) {
-		if (mActivity == null) {
+		if (mActivity == null || mService == null) {
 			return;
 		}
 
@@ -130,6 +130,10 @@ public abstract class BillingManager {
 			producePurchaseFailedEvent();
 		}
 
+        if (buyIntentBundle == null) {
+            return;
+        }
+
 		PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
 
 		try {
@@ -142,7 +146,7 @@ public abstract class BillingManager {
 	}
 
 	public void consumeProduct(String token, final CCSimpleHandler handler) {
-		if (mActivity == null) {
+		if (mActivity == null || mService == null) {
 			return;
 		}
 
@@ -177,73 +181,78 @@ public abstract class BillingManager {
 	}
 
 	private void loadPurchasedItems(final String continuationToken, final PurchasedItemVO[] items, final CCSimpleHandler<PurchasedItemVO[]> handler) {
-		if (mActivity == null) {
+		if (mActivity == null || mService == null) {
 			return;
 		}
 
 		new AsyncTask<Object, Object, Object>() {
 			@Override protected Object doInBackground(Object[] objects) {
-                if (mService == null || mActivity == null)
+                if (mService == null || mActivity == null) {
                     this.cancel(true);
+                }
 
-				Bundle ownedItems = null;
+                if (!isCancelled()) {
+                    Bundle ownedItems = null;
 
-				try {
-					ownedItems = mService.getPurchases(3, mActivity.getPackageName(), "inapp", continuationToken);
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
+                    try {
+                        ownedItems = mService.getPurchases(3, mActivity.getPackageName(), "inapp", continuationToken);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
 
-				if (ownedItems == null) {
-					handler.setError();
-				}
+                    if (ownedItems == null) {
+                        handler.setError();
+                        return null;
+                    }
 
-				int response = ownedItems.getInt("RESPONSE_CODE");
+                    int response = ownedItems.getInt("RESPONSE_CODE");
 
-				if (response == 0) {
-					ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
-					ArrayList<String> purchaseDataList = ownedItems.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
-					ArrayList<String> signatureList = ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE");
-					String cToken = ownedItems.getString("INAPP_CONTINUATION_TOKEN");
+                    if (response == 0) {
+                        ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+                        ArrayList<String> purchaseDataList = ownedItems.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
+                        ArrayList<String> signatureList = ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE");
+                        String cToken = ownedItems.getString("INAPP_CONTINUATION_TOKEN");
 
-					PurchasedItemVO item;
+                        PurchasedItemVO item;
 
-					PurchasedItemVO[] newItems = new PurchasedItemVO[items.length + purchaseDataList.size()];
+                        PurchasedItemVO[] newItems = new PurchasedItemVO[items.length + purchaseDataList.size()];
 
-					for (int i = 0; i < items.length; i++) {
-						newItems[i] = items[i];
-					}
+                        for (int i = 0; i < items.length; i++) {
+                            newItems[i] = items[i];
+                        }
 
-					for (int i = 0; i < purchaseDataList.size(); ++i) {
-						item = new PurchasedItemVO();
+                        for (int i = 0; i < purchaseDataList.size(); ++i) {
+                            item = new PurchasedItemVO();
 
-						if (purchaseDataList != null && i < purchaseDataList.size()) {
-							try {
-								item.purchasedData = new Gson().fromJson(purchaseDataList.get(i), PurchasedItemVO.PurchaseData.class);
-							} catch (Exception e) {
-								CCLog.logError(e.toString());
-							}
-						}
+                            if (purchaseDataList != null && i < purchaseDataList.size()) {
+                                try {
+                                    item.purchasedData = new Gson().fromJson(purchaseDataList.get(i), PurchasedItemVO.PurchaseData.class);
+                                } catch (Exception e) {
+                                    CCLog.logError(e.toString());
+                                }
+                            }
 
-						if (signatureList != null && i < signatureList.size()) {
-							item.signature = signatureList.get(i);
-						}
+                            if (signatureList != null && i < signatureList.size()) {
+                                item.signature = signatureList.get(i);
+                            }
 
-						if (ownedSkus != null && i < ownedSkus.size()) {
-							item.sku = ownedSkus.get(i);
-						}
+                            if (ownedSkus != null && i < ownedSkus.size()) {
+                                item.sku = ownedSkus.get(i);
+                            }
 
-						newItems[(items.length > 0 ? items.length - 1 : 0) + i] = item;
-					}
+                            newItems[(items.length > 0 ? items.length - 1 : 0) + i] = item;
+                        }
 
-					if (cToken != null) {
-						loadPurchasedItems(cToken, newItems, handler);
-					} else {
-						handler.setSuccess(newItems);
-					}
-				} else {
-					handler.setError();
-				}
+                        if (cToken != null) {
+                            loadPurchasedItems(cToken, newItems, handler);
+                        } else {
+                            handler.setSuccess(newItems);
+                        }
+                    } else {
+                        handler.setError();
+                    }
+
+                }
 
 				return null;
 			}
@@ -255,8 +264,11 @@ public abstract class BillingManager {
 
 			@Override
 			protected List<StoreProductVO> doInBackground(Object... objects) {
-                if (mService == null || mActivity == null)
+                if (mService == null || mActivity == null) {
                     this.cancel(true);
+                    return null;
+                }
+
 
 				ArrayList skuList = new ArrayList();
                 List<StoreProductVO> result;
