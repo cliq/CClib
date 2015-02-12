@@ -870,16 +870,14 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
 
         debugLog("resolveConnectionResult: trying to resolve result: "
                 + mConnectionResult);
-        if (mConnectionResult.hasResolution()) {
+        if (mConnectionResult.hasResolution() && mActivity != null && mActivity.get() != null) {
             // This problem can be fixed. So let's try to fix it.
             debugLog("Result has resolution. Starting it.");
             try {
                 // launch appropriate UI flow (which might, for example, be the
                 // sign-in flow)
-                if (mActivity.get() != null) {
-                    mExpectingResolution = true;
-                    mConnectionResult.startResolutionForResult(mActivity.get(), RC_RESOLVE);
-                }
+                mExpectingResolution = true;
+                mConnectionResult.startResolutionForResult(mActivity.get(), RC_RESOLVE);
 
             } catch (SendIntentException e) {
                 // Try connecting again
