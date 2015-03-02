@@ -943,7 +943,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
             int actResp = mSignInFailureReason.getActivityResultCode();
 
             if (mShowErrorDialogs) {
-                if (mActivity.get() != null) {
+                if (mActivity != null && mActivity.get() != null) {
                     showFailureDialog(mActivity.get(), actResp, errorCode);
                 }
             } else {
