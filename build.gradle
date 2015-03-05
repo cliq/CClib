@@ -26,7 +26,7 @@ configurations {
 
 dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
-    compile 'com.google.android.gms:play-services:6.1.+'
+    compile 'com.google.android.gms:play-services:6.+'
     compile 'com.mcxiaoke.volley:library:1.0+'
     apt "com.googlecode.androidannotations:androidannotations:2.7.1"
     compile 'com.googlecode.androidannotations:androidannotations-api:2.7.1'
