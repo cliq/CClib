@@ -107,8 +107,9 @@ public abstract class BillingManager {
 		};
 
 		mActivity = activity;
-		mActivity.bindService(new Intent("com.android.vending.billing.InAppBillingService.BIND"),
-				mServiceConn, Context.BIND_AUTO_CREATE);
+		Intent intent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
+		intent.setPackage("com.android.vending");
+		mActivity.bindService(intent, mServiceConn, Context.BIND_AUTO_CREATE);
 	}
 
 	protected Activity getActivity() {
