@@ -41,7 +41,6 @@ dependencies {
     apt "com.squareup.dagger:dagger-compiler:1.2.1"
     compile 'com.squareup.dagger:dagger:1.2.1'
     compile 'com.squareup:otto:1.3.4'
-    compile project(':dependencies:facebook-debug')
-
+    compile 'com.facebook.android:facebook-android-sdk:4.1.1'
 
 }
